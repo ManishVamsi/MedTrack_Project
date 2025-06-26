@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='5' y='90' font-size='90'>➕</text></svg>" type="image/svg+xml">
+    <title>Medtrack - Your Personal Health Companion</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+        background: linear-gradient(135deg, #6B9DE8 0%, #2F76D1 100%);
+        }
+        .feature-card {
+        transition: all 0.3s ease;
+        }
+        .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        html {
+        scroll-behavior: smooth;
+        }
+        /* Custom styles for the new contact section for better aesthetics */
+        .contact-card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 2.5rem;
+            text-align: center;
+            margin-top: 2rem;
+            animation: fadeIn 1s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .contact-icon {
+            font-size: 3rem;
+            color: #2563eb; /* blue-600 */
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased text-gray-800">
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class="fas fa-heartbeat text-3xl text-pink-600"></i>
+                        <span class="ml-2 text-xl font-bold text-blue-600">Medtrack</span>
+                    </div>
+                </div>
+                <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                    <a href="{{ url_for('index') }}"
+                    class="border-b-2 border-transparent text-gray-700 hover:border-blue-500 hover:text-blue-600 inline-flex items-center px-1 pt-1 text-base font-medium transition duration-150 ease-in-out">Home</a>
+                    <a href="#about-us"
+                    class="border-b-2 border-transparent text-gray-500 hover:border-blue-500 hover:text-blue-600 inline-flex items-center px-1 pt-1 text-base font-medium transition duration-150 ease-in-out">About Us</a>
+                    <a href="#contact-us"
+                    class="border-b-2 border-transparent text-gray-500 hover:border-blue-500 hover:text-blue-600 inline-flex items-center px-1 pt-1 text-base font-medium transition duration-150 ease-in-out">Contact Us</a>
+                </div>
+
+                <div class="hidden sm:ml-6 sm:flex sm:items-center space-x-4">
+                    {% if session.user_email %}
+                        <span class="text-sm text-gray-500">Welcome, {{ session.username }}</span>
+                        <a href="{{ url_for('logout') }}" class="px-3 py-2 rounded-md text-sm font-medium text-blue-600 hover:bg-blue-50">Logout</a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="px-3 py-2 rounded-md text-sm font-medium text-blue-600 hover:bg-blue-50">Login</a>
+                        <a href="{{ url_for('register') }}" class="px-3 py-2 rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">Sign Up</a>
+                    {% endif %}
+                </div>
+                <div class="-mr-2 flex items-center sm:hidden">
+                    <button type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+                        <span class="sr-only">Open main menu</span>
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div id="flash-messages" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+                {% for category, message in messages %}
+                    <div class="flash-message p-4 mb-4 text-sm
+                    {% if category == 'success' %}bg-green-100 text-green-800
+                    {% elif category == 'error' %}bg-red-100 text-red-800
+                    {% else %}bg-blue-100 text-blue-800
+                    {% endif %} rounded-lg" role="alert">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="gradient-bg text-white">
+        <div class="max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">Revolutionizing Healthcare Access</h1>
+            <p class="mt-6 max-w-2xl mx-auto text-xl">Connect with doctors instantly, manage your medications seamlessly, and take control of your health journey.</p>
+            <div class="mt-10">
+                <a href="{{ url_for('register') }}"
+                class="px-10 py-4 border border-transparent text-lg font-bold rounded-full text-blue-700 bg-white hover:bg-gray-100 md:py-5 md:text-xl md:px-12 shadow-lg hover:shadow-xl transition duration-300 ease-in-out transform hover:scale-105">Get Started Today!</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="lg:text-center mb-12">
+                <h2 class="text-base text-blue-600 font-semibold tracking-wide uppercase">Core Features</h2>
+                <p class="mt-2 text-4xl leading-tight font-bold tracking-tight text-gray-900 sm:text-5xl">A smarter way to manage your health</p>
+            </div>
+            <div class="mt-10">
+                <div class="space-y-10 md:space-y-0 md:grid md:grid-cols-2 lg:grid-cols-4 md:gap-x-8 md:gap-y-12">
+                    <div class="feature-card relative p-8 rounded-xl border border-gray-200 shadow-lg bg-white">
+                        <div class="flex flex-col items-center text-center">
+                            <div class="flex-shrink-0 bg-blue-500 rounded-full p-4 mb-4">
+                                <i class="fas fa-user-md text-white text-3xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900 mb-2">Doctor Consultations</h3>
+                            <p class="text-gray-600 text-sm">Book appointments with qualified doctors based on your health needs. Video consultations available for remote care.</p>
+                        </div>
+                    </div>
+                    <div class="feature-card relative p-8 rounded-xl border border-gray-200 shadow-lg bg-white">
+                        <div class="flex flex-col items-center text-center">
+                            <div class="flex-shrink-0 bg-green-500 rounded-full p-4 mb-4">
+                                <i class="fas fa-pills text-white text-3xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900 mb-2">Medication Reminders</h3>
+                            <p class="text-gray-600 text-sm">Never miss a dose with our smart medication reminder system. Get alerts and track your medication history.</p>
+                        </div>
+                    </div>
+                    <div class="feature-card relative p-8 rounded-xl border border-gray-200 shadow-lg bg-white">
+                        <div class="flex flex-col items-center text-center">
+                            <div class="flex-shrink-0 bg-purple-500 rounded-full p-4 mb-4">
+                                <i class="fas fa-calendar-check text-white text-3xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900 mb-2">Appointment Management</h3>
+                            <p class="text-gray-600 text-sm">Easily schedule, reschedule or cancel appointments. Receive automatic reminders before your appointments.</p>
+                        </div>
+                    </div>
+                    <div class="feature-card relative p-8 rounded-xl border border-gray-200 shadow-lg bg-white">
+                        <div class="flex flex-col items-center text-center">
+                            <div class="flex-shrink-0 bg-red-500 rounded-full p-4 mb-4">
+                                <i class="fas fa-shield-alt text-white text-3xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900 mb-2">Secure Health Records</h3>
+                            <p class="text-gray-600 text-sm">Your health data is encrypted and stored securely. Access your medical history anytime, anywhere.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+   <div id="about-us" class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="lg:text-center mb-12">
+                <h2 class="text-base text-blue-600 font-semibold tracking-wide uppercase">About Medtrack</h2>
+                <p class="mt-2 text-4xl leading-tight font-bold tracking-tight text-gray-900 sm:text-5xl">Our mission is your health</p>
+            </div>
+            <div class="mt-10 mx-auto max-w-4xl text-lg leading-relaxed text-gray-700">
+                <p class="mb-6">Medtrack was founded with a simple goal: to make healthcare accessible and manageable for everyone. We believe that managing your health shouldn't be complicated or stressful.</p>
+                <p class="mb-6">Our platform connects patients with qualified doctors, helping to bridge the gap between healthcare providers and those who need care. With our medication management tools, we help patients stay on track with their treatment plans, ensuring better health outcomes.</p>
+                <p>Whether you're a busy professional, managing chronic conditions, or just need occasional medical advice, Medtrack is here to support your health journey with reliable tools and a user-friendly interface.</p>
+            </div>
+        </div>
+    </div>
+    <div id="contact-us" class="py-12 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="lg:text-center">
+                <h2 class="text-base text-blue-600 font-semibold tracking-wide uppercase">Contact Us</h2>
+                <p class="mt-2 text-3xl leading-8 font-bold tracking-tight text-gray-900 sm:text-4xl">We're here to help, 24/7</p>
+            </div>
+            <div class="mt-10 max-w-2xl mx-auto contact-card">
+                <i class="fas fa-headset contact-icon"></i>
+                <h3 class="text-2xl font-semibold text-gray-900 mb-4">Need Assistance?</h3>
+                <p class="text-gray-700 text-lg mb-6">Our dedicated support team is available around the clock to assist you with any queries or concerns.</p>
+                
+                <div class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-8">
+                    <div class="flex items-center">
+                        <i class="fas fa-phone-alt text-blue-500 text-xl mr-3"></i>
+                        <div>
+                            <p class="text-gray-800 font-semibold">Customer Care</p>
+                            <a href="tel:+180044555666" class="text-blue-600 hover:underline text-lg">+1 (800) 445-5566</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center justify-center mt-6">
+                    <i class="fas fa-envelope text-blue-500 text-xl mr-3"></i>
+                    <div>
+                        <p class="text-gray-800 font-semibold">Email Us</p>
+                        <a href="mailto:support@medtrack.com" class="text-blue-600 hover:underline text-lg">support@medtrack.com</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="bg-gray-800">
+        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-white text-sm">&copy; 2025 Medtrack. All rights reserved.</p>
+            <p class="mt-4 text-gray-400 text-sm">
+                Follow us on:
+                <a href="#" class="text-blue-400 hover:text-blue-300 mx-2 text-lg transition duration-150 ease-in-out"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="text-blue-400 hover:text-blue-300 mx-2 text-lg transition duration-150 ease-in-out"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="text-blue-400 hover:text-blue-300 mx-2 text-lg transition duration-150 ease-in-out"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="text-blue-400 hover:text-blue-300 mx-2 text-lg transition duration-150 ease-in-out"><i class="fab fa-linkedin"></i></a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const flashMessages = document.querySelectorAll('.flash-message');
+            flashMessages.forEach(message => {
+                setTimeout(() => {
+                    message.style.transition = 'opacity 0.5s ease-out';
+                    message.style.opacity = '0';
+                    setTimeout(() => { message.remove(); }, 500);
+                }, 5000);
+            });
+        });
+    </script>
+</body>
+</html>

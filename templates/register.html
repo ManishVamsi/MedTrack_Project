@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medtrack - Register</title>
+    <link rel="icon" href="data:image/svg+xml,
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='5' y='90' font-size='90'>➕</text></svg>" type="image/svg+xml">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(to bottom right, #e0f2fe, #bad5eb);
+            min-height: 100vh;
+        }
+        .signup-container { /* Kept class name for styling consistency, but refers to register form */
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            background-color: #fff;
+        }
+        .flash-message {
+            opacity: 1;
+            transition: opacity 0.5s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <nav class="bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex-shrink-0 flex items-center">
+                    <i class="fas fa-heartbeat text-3xl text-pink-600"></i>
+                    <span class="ml-2 text-xl font-bold text-blue-600">Medtrack</span>
+                </div>
+                <div>
+                    <a href="{{ url_for('index') }}" class="px-3 py-2 rounded-md text-sm font-medium text-blue-600 hover:bg-blue-50">Home</a>
+                    {# Only show welcome/logout if session exists (though typically signup doesn't have session) #}
+                    {% if session.user_email %}
+                        <span class="text-sm text-gray-500 ml-4">Welcome, {{ session.username }}</span>
+                        <a href="{{ url_for('logout') }}" class="px-3 py-2 rounded-md text-sm font-medium text-blue-600 hover:bg-blue-50">Logout</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div id="flash-messages" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+                {% for category, message in messages %}
+                    <div class="flash-message p-4 mb-4 text-sm
+                    {% if category == 'success' %}bg-green-100 text-green-800
+                    {% elif category == 'error' %}bg-red-100 text-red-800
+                    {% else %}bg-blue-100 text-blue-800
+                    {% endif %} rounded-lg" role="alert">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    <div class="signup-container">
+        <h2 class="text-3xl font-extrabold text-center text-gray-900 mb-6">Create Your Account</h2>
+        <form action="{{ url_for('register') }}" method="POST" onsubmit="return validatePassword()"> {# Corrected from signup_page #}
+            <div class="mb-4">
+                <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Full Name</label>
+                <input type="text" id="name" name="name" placeholder="John Doe" required
+                       class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div class="mb-4">
+                <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                <input type="email" id="email" name="email" placeholder="you@example.com" required
+                       class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div class="mb-4">
+                <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Password</label>
+                <input type="password" id="password" name="password" placeholder="********" required
+                       class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div class="mb-4">
+                <label for="confirm_password" class="block text-gray-700 text-sm font-bold mb-2">Confirm Password</label>
+                <input type="password" id="confirm_password" name="confirm_password" placeholder="********" required
+                       class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <p id="password-match-error" class="text-red-500 text-xs italic mt-2 hidden">Passwords do not match.</p>
+            </div>
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-bold mb-2">I am a:</label>
+                <div class="mt-2">
+                    <label class="inline-flex items-center mr-6">
+                        <input type="radio" name="user_type" value="patient" id="user-type-patient" class="form-radio h-4 w-4 text-blue-600" checked>
+                        <span class="ml-2 text-gray-700">Patient</span>
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="radio" name="user_type" value="doctor" id="user-type-doctor" class="form-radio h-4 w-4 text-blue-600">
+                        <span class="ml-2 text-gray-700">Doctor</span>
+                    </label>
+                </div>
+            </div>
+
+            <div id="specialization-field" class="mb-4 hidden">
+                <label for="specialization" class="block text-gray-700 text-sm font-bold mb-2">Specialization</label>
+                <input type="text" id="specialization" name="specialization" placeholder="e.g., Cardiology, Pediatrics"
+                       class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            {# NEW: Location Field for Doctors #}
+            <div id="location-field" class="mb-4 hidden">
+                <label for="location" class="block text-gray-700 text-sm font-bold mb-2">Location (City, Clinic Name)</label>
+                <input type="text" id="location" name="location" placeholder="e.g., Srikakulam, City Hospital"
+                       class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div class="mb-4">
+                <label class="inline-flex items-center">
+                    <input type="checkbox" name="terms" required class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                    <span class="ml-2 text-sm text-gray-600">I agree to the <a href="#" class="text-blue-600 hover:text-blue-800">Terms and Conditions</a></span>
+                </label>
+            </div>
+
+            <div class="flex items-center justify-between">
+                <button type="submit"
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    Create Account
+                </button>
+            </div>
+            <div class="mt-4 text-center">
+                <p class="text-gray-600 text-sm">Already have an account?
+                    <a href="{{ url_for('login') }}" class="text-blue-600 hover:text-blue-800">Login here</a> {# Corrected from login_page #}
+                </p>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const flashMessages = document.querySelectorAll('.flash-message');
+            flashMessages.forEach(message => {
+                setTimeout(() => {
+                    message.style.transition = 'opacity 0.5s ease-out';
+                    message.style.opacity = '0';
+                    setTimeout(() => { message.remove(); }, 500);
+                }, 5000);
+            });
+            // Logic for showing/hiding specialization and location fields
+            const userTypeRadios = document.querySelectorAll('input[name="user_type"]');
+            const specializationField = document.getElementById('specialization-field');
+            const specializationInput = document.getElementById('specialization');
+            const locationField = document.getElementById('location-field'); // Get location field
+            const locationInput = document.getElementById('location');     // Get location input
+
+            function toggleDoctorFields() { // Renamed for clarity
+                if (document.getElementById('user-type-doctor').checked) {
+                    specializationField.classList.remove('hidden');
+                    specializationInput.setAttribute('required', 'required'); // Make required when visible
+                    locationField.classList.remove('hidden'); // Show location field
+                    locationInput.setAttribute('required', 'required'); // Make location required
+                } else {
+                    specializationField.classList.add('hidden');
+                    specializationInput.removeAttribute('required'); // Remove required when hidden
+                    specializationInput.value = ''; // Clear value when hidden
+                    locationField.classList.add('hidden'); // Hide location field
+                    locationInput.removeAttribute('required'); // Remove required
+                    locationInput.value = ''; // Clear value
+                }
+            }
+            // Add event listeners to radio buttons
+            userTypeRadios.forEach(radio => {
+                radio.addEventListener('change', toggleDoctorFields);
+            });
+            // Initial check on page load (in case 'doctor' was pre-selected, though 'patient' is default)
+            toggleDoctorFields();
+        });
+        // Client-side password validation function
+        function validatePassword() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            const errorElement = document.getElementById('password-match-error');
+
+            if (password !== confirmPassword) {
+                errorElement.classList.remove('hidden');
+                return false; // Prevent form submission
+            } else {
+                errorElement.classList.add('hidden');
+                return true; // Allow form submission
+            }
+        }
+    </script>
+</body>
+</html>

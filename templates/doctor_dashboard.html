@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='5' y='90' font-size='90'>➕</text></svg>" type="image/svg+xml">
+    <title>Doctor Dashboard - Medtrack</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .flash-message {
+            opacity: 1;
+            transition: opacity 0.5s ease-out;
+        }
+        .tab-pane.active { display: block; }
+        .tab-pane { display: none; }
+        .tab-button.active {
+            background-color: #2563eb; /* blue-600 */
+            color: white;
+        }
+        .status-approved { color: #10B981;}
+        .status-pending { color: #F59E0B; }
+        .status-cancelled { color: #EF4444; }
+        .status-completed { color: #8B5CF6; }
+        .status-rejected { color: #EF4444; }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans antialiased">
+    <nav class="bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex-shrink-0 flex items-center">
+                    <i class="fas fa-heartbeat text-3xl text-pink-600"></i>
+                    <span class="ml-2 text-xl font-bold text-blue-600">Medtrack</span>
+                </div>
+                <div>
+                    <a href="{{ url_for('index') }}" class="px-3 py-2 rounded-md text-sm font-medium text-blue-600 hover:bg-blue-50">Home</a>
+                    <span class="text-sm text-gray-500 ml-4">Welcome, Dr. {{ username }}</span> {# username here is the doctor's name #}
+                    <a href="{{ url_for('logout') }}" class="px-3 py-2 rounded-md text-sm font-medium text-blue-600 hover:bg-blue-50">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div id="flash-messages" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+                {% for category, message in messages %}
+                    <div class="flash-message p-4 mb-4 text-sm
+                    {% if category == 'success' %}bg-green-100 text-green-800
+                    {% elif category == 'error' %}bg-red-100 text-red-800
+                    {% else %}bg-blue-100 text-blue-800
+                    {% endif %} rounded-lg" role="alert">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="container mx-auto p-4 mt-6 bg-white rounded-lg shadow-md">
+        <h1 class="text-3xl font-bold text-blue-800 mb-6">Doctor Dashboard</h1>
+
+        <div class="nav-tabs flex space-x-1 mb-4 border-b border-gray-200">
+            <button class="tab-button px-4 py-2 rounded-t-lg text-gray-600 font-semibold hover:bg-gray-100 active" onclick="openTab('doctor-appointments-section')">Appointments</button>
+            <button class="tab-button px-4 py-2 rounded-t-lg text-gray-600 font-semibold hover:bg-gray-100" onclick="openTab('doctor-issue-prescription-section')">Issue Prescription</button>
+            <button class="tab-button px-4 py-2 rounded-t-lg text-gray-600 font-semibold hover:bg-gray-100" onclick="openTab('doctor-prescriptions-section')">View Prescriptions</button>
+        </div>
+
+<div id="doctor-appointments-section" class="tab-pane active p-6 border border-gray-200 rounded-b-xl bg-gray-50">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-5">Patient Appointments</h2>
+            {% if appointments %}
+                <div class="overflow-x-auto rounded-xl shadow-md"> {# Added rounded-xl and shadow-md to table wrapper #}
+                    <table class="min-w-full bg-white divide-y divide-gray-200">
+                        <thead class="bg-blue-50"> {# Light blue header background #}
+                            <tr>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider rounded-tl-xl">Patient Name</th> {# Rounded corner for top-left #}
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">Patient Email</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">Date</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">Time</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">Reason</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">Status</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider rounded-tr-xl">Actions</th> {# Rounded corner for top-right #}
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            {% for apt in appointments %}
+                            <tr class="table-row-hover"> {# Apply hover effect to rows #}
+                                <td class="py-3 px-4 whitespace-nowrap">{{ apt.patient_name }}</td>
+                                <td class="py-3 px-4 whitespace-nowrap text-gray-600 text-sm">{{ apt.patient_email }}</td>
+                                <td class="py-3 px-4 whitespace-nowrap"><i class="far fa-calendar-alt text-blue-500 mr-2"></i>{{ apt.date }}</td>
+                                <td class="py-3 px-4 whitespace-nowrap"><i class="far fa-clock text-blue-500 mr-2"></i>{{ apt.time }}</td>
+                                <td class="py-3 px-4">{{ apt.reason }}</td>
+                                <td class="py-3 px-4">
+                                    <span class="font-bold status-{{ apt.status | lower }}">
+                                        <i class="fas fa-info-circle mr-2"></i>{{ apt.status }}
+                                    </span>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <form action="{{ url_for('update_appointment_status') }}" method="POST" class="flex items-center space-x-2">
+                                        <input type="hidden" name="appointment_id" value="{{ apt._id }}"> 
+                                        <label for="status-{{ apt._id }}" class="sr-only">Update Status</label>
+                                        <select id="status-{{ apt._id }}" name="status"
+                                                class="p-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+                                                onchange="this.form.submit()">
+                                            <option value="Pending" {% if apt.status == 'Pending' %}selected{% endif %}>Pending</option>
+                                            <option value="Approved" {% if apt.status == 'Approved' %}selected{% endif %}>Approved</option>
+                                            <option value="Completed" {% if apt.status == 'Completed' %}selected{% endif %}>Completed</option>
+                                            <option value="Cancelled" {% if apt.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                                            <option value="Rejected" {% if apt.status == 'Rejected' %}selected{% endif %}>Rejected</option>
+                                        </select>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-10 bg-white rounded-lg shadow-inner">
+                    <i class="fas fa-calendar-alt text-6xl text-gray-300 mb-4"></i>
+                    <p class="text-gray-600 text-lg">No appointments scheduled for you yet.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <div id="doctor-issue-prescription-section" class="tab-pane p-4 border border-gray-200 rounded-b-lg bg-gray-50">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Issue New Prescription</h2>
+            <form action="{{ url_for('issue_prescription') }}" method="POST" class="space-y-4">
+                <div>
+                    <label for="patient_email_prescribe" class="block text-gray-700 font-bold mb-1">Patient Email:</label>
+                    <input type="email" id="patient_email_prescribe" name="patient_email_prescribe" required class="w-full p-2 border border-gray-300 rounded-md" placeholder="patient@example.com">
+                </div>
+                <div>
+                    <label for="medication" class="block text-gray-700 font-bold mb-1">Medication Name:</label>
+                    <input type="text" id="medication" name="medication" required class="w-full p-2 border border-gray-300 rounded-md" placeholder="e.g., Amoxicillin">
+                </div>
+                <div>
+                    <label for="dosage" class="block text-gray-700 font-bold mb-1">Dosage:</label>
+                    <input type="text" id="dosage" name="dosage" required class="w-full p-2 border border-gray-300 rounded-md" placeholder="e.g., 250mg, 1 tablet daily">
+                </div>
+                <div>
+                    <label for="instructions" class="block text-gray-700 font-bold mb-1">Instructions:</label>
+                    <textarea id="instructions" name="instructions" rows="3" required class="w-full p-2 border border-gray-300 rounded-md" placeholder="e.g., Take with food, Finish the course..."></textarea>
+                </div>
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Issue Prescription</button>
+            </form>
+        </div>
+
+        <div id="doctor-prescriptions-section" class="tab-pane p-6 border border-gray-200 rounded-b-xl bg-gray-50">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-5">Issued Prescriptions</h2>
+            {% if prescriptions %} {# 'prescriptions' here is already a list of only this doctor's prescriptions #}
+                <div class="overflow-x-auto rounded-xl shadow-md"> {# Added rounded-xl and shadow-md to table wrapper #}
+                    <table class="min-w-full bg-white divide-y divide-gray-200">
+                        <thead class="bg-green-50"> {# Light green header background #}
+                            <tr>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-green-700 uppercase tracking-wider rounded-tl-xl">Patient Details</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-green-700 uppercase tracking-wider">Medication</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-green-700 uppercase tracking-wider">Dosage</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-green-700 uppercase tracking-wider">Instructions</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-green-700 uppercase tracking-wider rounded-tr-xl">Date Issued</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            {% for pres in prescriptions %}
+                            <tr class="table-row-hover"> {# Apply hover effect to rows #}
+                                <td class="py-3 px-4 whitespace-nowrap">
+                                    <p class="font-medium">{{ pres.patient_name }}</p>
+                                    <p class="text-xs text-gray-500">{{ pres.patient_email }}</p>
+                                </td>
+                                <td class="py-3 px-4 whitespace-nowrap"><i class="fas fa-pills text-purple-500 mr-2"></i>{{ pres.medication }}</td>
+                                <td class="py-3 px-4 whitespace-nowrap">{{ pres.dosage }}</td>
+                                <td class="py-3 px-4">{{ pres.instructions }}</td>
+                                <td class="py-3 px-4 whitespace-nowrap"><i class="far fa-calendar-check text-purple-500 mr-2"></i>{{ pres.date_prescribed }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-10 bg-white rounded-lg shadow-inner">
+                    <i class="fas fa-file-prescription text-6xl text-gray-300 mb-4"></i>
+                    <p class="text-gray-600 text-lg">No prescriptions issued by you yet.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        // Flash message dismissal
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const flashMessages = document.querySelectorAll('.flash-message');
+            flashMessages.forEach(message => {
+                setTimeout(() => {
+                    message.style.transition = 'opacity 0.5s ease-out';
+                    message.style.opacity = '0';
+                    setTimeout(() => { message.remove(); }, 500);
+                }, 5000);
+            });
+            // Tab switching logic
+            window.openTab = function(tabId) {
+                // Deactivate all tab panes and buttons
+                document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+                document.querySelectorAll('.tab-button').forEach(button => button.classList.remove('active'));
+
+                // Activate the selected tab pane and button
+                document.getElementById(tabId).classList.add('active');
+                document.querySelector(`.tab-button[onclick*="${tabId}"]`).classList.add('active');
+
+                // Update URL without reloading the page for better UX
+                const url = new URL(window.location);
+                url.searchParams.set('section', tabId);
+                window.history.pushState({}, '', url);
+            }
+            // Get section from URL on page load and activate corresponding tab
+            const urlParams = new URLSearchParams(window.location.search);
+            const section = urlParams.get('section');
+            if (section) {
+                // Find the corresponding tab pane and button using the section ID
+                const targetPane = document.getElementById(section);
+                // The original code had a potentially problematic selector with single quotes: `[onclick*=\\'${section}\\']`
+                // This is a safer alternative that relies on the exact onclick attribute value
+                const targetButton = document.querySelector(`.tab-button[onclick="openTab('${section}')"]`);
+
+                if (targetPane && targetButton) {
+                    // Deactivate all current active tabs/buttons
+                    document.querySelectorAll('.tab-pane.active').forEach(pane => pane.classList.remove('active'));
+                    document.querySelectorAll('.tab-button.active').forEach(button => button.classList.remove('active'));
+
+                    // Activate the requested tab and button
+                    targetPane.classList.add('active');
+                    targetButton.classList.add('active');
+                } else {
+                    // Fallback if the section from URL is invalid
+                    console.warn(`Section '${section}' not found, defaulting to first tab.`);
+                    document.querySelector('.tab-pane').classList.add('active');
+                    document.querySelector('.tab-button').classList.add('active');
+                }
+            } else {
+                // Default to the first tab if no section is specified in the URL
+                document.querySelector('.tab-pane').classList.add('active');
+                document.querySelector('.tab-button').classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>
