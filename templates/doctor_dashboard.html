@@ -205,7 +205,6 @@
                 // Activate the selected tab pane and button
                 document.getElementById(tabId).classList.add('active');
                 document.querySelector(`.tab-button[onclick*="${tabId}"]`).classList.add('active');
-
                 // Update URL without reloading the page for better UX
                 const url = new URL(window.location);
                 url.searchParams.set('section', tabId);
