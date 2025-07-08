@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # AWS Region (best practice: use environment variables or IAM roles on EC2)
-AWS_REGION = os.environ.get('AWS_REGION', 'ap-south-1') # e.g., 'us-east-1', 'ap-south-1'
+AWS_REGION = os.environ.get('AWS_REGION', 'us-east-1') # e.g., 'us-east-1', 'ap-south-1'
 
 # Initialize Boto3 clients and resources for DynamoDB and SNS.
 # When running on an EC2 instance with an associated IAM Role, boto3 will automatically pick up credentials from the instance metadata.
@@ -45,7 +45,7 @@ except Exception as e:
 # SNS Topic ARN for notifications.
 # replace this with the ARN of an existing SNS Topic in your AWS account.
 # Subscribe emails/phone numbers to this topic to receive notifications.
-SNS_TOPIC_ARN = os.environ.get('SNS_TOPIC_ARN', 'arn:aws:sns:YOUR_AWS_REGION:YOUR_ACCOUNT_ID:medtrack-notifications') # REPLACE WITH YOUR ACTUAL SNS TOPIC ARN
+SNS_TOPIC_ARN = os.environ.get('SNS_TOPIC_ARN', 'arn:aws:sns:us-east-1:418272775181:Medtrack:911baee0-b2d6-4c3d-b735-a29a602727f1') # REPLACE WITH YOUR ACTUAL SNS TOPIC ARN
 
 # --- Helper function to prepare DynamoDB items for Jinja2 templates ---
 def serialize_doc(item):
